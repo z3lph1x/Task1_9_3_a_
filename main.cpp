@@ -37,34 +37,28 @@ vector<double> Runge_Kutta_4(double y0, double z0, double a, double b, int N) {
 
 
 int main() {
-    int N = 20;
+    int N = 1000;
     double e = 0.001;
     double a = 0;
     double b = 1;
-    double a1 = 1.5;
-    double a2 = 2.5;
-    double m = (a1 + a2) / 2;
-    vector<double> ans1;
-    ans1 = Runge_Kutta_4(0, a1, a, b, N);//alpha1 = a1
-    vector<double> ans2 = Runge_Kutta_4(0, a2, a, b, N);//alpha1 = a2
-    vector<double> ans3;
-    ans3 = Runge_Kutta_4(0, m, a, b, N);//in the middle
-    double f1 = ans1[N - 1];
-    double f2 = ans2[N - 1];
-    double f;
-    f = ans3[N - 1];
-    while (abs(f - 2) > e) {
-        if (f > 2) {
-            a2 = m;
-            m = (a1 + a2) / 2;
-        } else {
-            if (b < 2) {
-                a1 = m;
-                m = (a1 + a2) / 2;
-            }
+    double h = (b-a)/N;
+    vector<double> alpha;
+    alpha.resize(N);
+    alpha[0] = 5;
+    double ans1 = Runge_Kutta_4(0, alpha[0]+ h, a, b, N)[N-1];//alpha1 + h
+    double ans2 = Runge_Kutta_4(0, alpha[0], a, b, N)[N-1];//alpha
+    double df = (ans1 - ans2)/h;
+    alpha[1]=alpha[0] - (ans2 - 2)/df;
+    for(int i = 2;i < N;i++){
+        if(abs(alpha[i-1]-alpha[i-2])>e) {
+            ans1 = Runge_Kutta_4(0, alpha[i - 1] + h, a, b, N)[N - 1];//alpha1 + h
+            ans2 = Runge_Kutta_4(0, alpha[i - 1], a, b, N)[N - 1];//alpha
+            df = (ans1 - ans2) / h;
+            alpha[i] = alpha[i - 1] - (ans2 - 2) / df;
         }
-        vector<double> result = Runge_Kutta_4(0, m, a, b, N);
-        f = result[N - 1];
+        else {
+            cout<< alpha[i-1]<<"<- alpha; "<<ans2<<" <- definition of function at the last iteration";
+            return 0;
+        }
     }
-    cout << f;
 }
